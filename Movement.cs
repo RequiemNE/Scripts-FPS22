@@ -8,6 +8,7 @@ public class Movement : MonoBehaviour
 
     [SerializeField] private Vector3 moveVal;
     [SerializeField] private float moveSpeed;
+    [SerializeField] private float jumpForce;
 
     private Rigidbody rb;
     private PlayerInput playerInput;
@@ -22,7 +23,17 @@ public class Movement : MonoBehaviour
         controller = GetComponent<CharacterController>();
 
         playerControls = new Controls();
-        playerControls.Player.Enable();        
+        playerControls.Player.Enable();
+        playerControls.Player.Jump.performed += Jump_performed;
+    }
+
+    private void Jump_performed(InputAction.CallbackContext obj)
+    {
+        if (obj.performed)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            // Need to add character controller gravity. 
+        }
     }
 
 
@@ -39,4 +50,5 @@ public class Movement : MonoBehaviour
         Vector3 move = transform.right * inputVector.x + transform.forward * inputVector.y;
         controller.Move(move * moveSpeed * Time.deltaTime);
     }
+
 }
