@@ -9,6 +9,9 @@ public class Movement : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float gravity;
+    [SerializeField] private Camera cam;
+    [Tooltip("Higher value = lower sensitivity.")][SerializeField] private float mouseSensitivity;
+    [Tooltip("Mouse clamp for looking up and down.")][SerializeField] private float xClamp;
 
     private Rigidbody rb;
     private PlayerInput playerInput;
@@ -29,13 +32,18 @@ public class Movement : MonoBehaviour
         playerControls.Player.Enable();
         playerControls.Player.Jump.performed += Jump_performed;
         playerControls.Player.Look.performed += Look_performed;
-        
     }
 
     private void Look_performed(InputAction.CallbackContext obj)
     {
-        Vector2 horizontalValue = playerControls.Player.Look.ReadValue<Vector2>();
-        gameObject.transform.Rotate(Vector3.up * horizontalValue.x);
+        // Horizontal input.
+        Vector2 inputValue = playerControls.Player.Look.ReadValue<Vector2>();
+        gameObject.transform.Rotate(Vector3.up * inputValue.x / mouseSensitivity);
+
+        // Vertical input.
+        cam.transform.Rotate(Vector3.left * inputValue.y / mouseSensitivity);
+
+        Mathf.Clamp(inputValue.y, xClamp, xClamp); // NEEDS WORK
     }
 
     private void Jump_performed(InputAction.CallbackContext obj)
@@ -47,22 +55,10 @@ public class Movement : MonoBehaviour
         }
     }
 
-
-
-    // Update is called once per frame
     void FixedUpdate()
     {
         Move();
 
-        //velocity.y += gravity * Time.deltaTime;
-       // controller.Move(velocity * Time.deltaTime);
-
-        if (!controller.isGrounded)
-        {
-            //rb.AddForce(Vector3.down * gravity, ForceMode.Impulse);
-
-        }
-        Debug.Log(controller.isGrounded);
     }
 
     private void Move()
