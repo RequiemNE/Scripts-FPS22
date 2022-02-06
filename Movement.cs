@@ -19,6 +19,11 @@ public class Movement : MonoBehaviour
     private Controls playerControls;
     private Vector2 inputVector;
 
+
+    private bool isGrounded;
+    public float dist;
+    public LayerMask mask;
+
     private Vector3 velocity;
 
     // Start is called before the first frame update
@@ -32,6 +37,14 @@ public class Movement : MonoBehaviour
         playerControls.Player.Enable();
         playerControls.Player.Jump.performed += Jump_performed;
         playerControls.Player.Look.performed += Look_performed;
+        playerControls.Player.Fire.performed += Fire;
+    }
+
+    private void Fire(InputAction.CallbackContext obj)
+    {
+        // pass to gun script. 
+
+        // figure out how to actually manage weapons. 
     }
 
     private void Look_performed(InputAction.CallbackContext obj)
@@ -50,15 +63,25 @@ public class Movement : MonoBehaviour
     {
         if (obj.performed)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            // Need to add character controller gravity. 
+            Jump();
+            
+            // maybe just set a bool canJump here.
+            // then use another fucition in update to jump.
+            // function would be if canJump = true, then jump.
+            // Once force is applied, canJump = false.
         }
+    }
+
+    private void Jump()
+    {
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Acceleration);
     }
 
     void FixedUpdate()
     {
         Move();
-
+        Check();
+        
     }
 
     private void Move()
@@ -66,6 +89,16 @@ public class Movement : MonoBehaviour
         inputVector = playerControls.Player.Move.ReadValue<Vector2>();
         Vector3 move = transform.right * inputVector.x + transform.forward * inputVector.y;
         controller.Move(move * moveSpeed * Time.deltaTime);
+    }
+
+    private void Check()
+    {
+        isGrounded = Physics.CheckSphere(transform.position, dist, mask);
+
+        if (!isGrounded)
+        {
+            velocity.y = -2f;
+        }
     }
 
 }
