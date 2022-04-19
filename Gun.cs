@@ -16,7 +16,7 @@ public class Gun : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray.transform.position, ray.transform.forward, out hit, Mathf.Infinity))
         {
-            Debug.DrawRay(ray.transform.position, ray.transform.forward, Color.red);
+            Debug.DrawRay(ray.transform.position, ray.transform.forward * 10, Color.red, 5.0f);
             Debug.Log("rayray");
         }
     }
